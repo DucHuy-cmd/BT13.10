@@ -1,0 +1,62 @@
+/* ==========================================================================
+   BÀI 5: SHOP PHỤ KIỆN ĐIỆN THOẠI MINI — GIỎ HÀNG ĐỘNG VỚI VUE.JS (CDN)
+   File: css/style.css
+   Mục đích: Định kiểu bổ trợ, animation giỏ hàng và xử lý v-cloak cho Vue 3 CDN
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+/* Tránh hiện tượng nháy template cú pháp {{ ... }} khi Vue đang khởi tạo */
+[v-cloak] {
+  display: none !important;
+}
+
+body {
+  font-family: 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f8fafc; /* slate-50 */
+  color: #0f172a; /* slate-900 */
+}
+
+/* Custom Scrollbar cho danh sách giỏ hàng */
+.cart-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.cart-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.cart-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.cart-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Hiệu ứng badge giỏ hàng rung nhẹ khi có sản phẩm mới */
+@keyframes cart-bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+}
+
+.badge-bounce {
+  animation: cart-bounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Hiệu ứng chuyển động mượt cho danh sách giỏ hàng */
+.cart-item-enter-active,
+.cart-item-leave-active {
+  transition: all 0.25s ease;
+}
+
+.cart-item-enter-from,
+.cart-item-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}

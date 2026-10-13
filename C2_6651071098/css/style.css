@@ -1,0 +1,65 @@
+/* ==========================================================================
+   BÀI 2: LANDING PAGE TIỆM BÁNH NGỌT VỚI TAILWIND CSS
+   File: css/style.css
+   Mục đích: Thiết lập font tiếng Việt chuẩn 100% không lỗi dấu và các style mở rộng
+   ========================================================================== */
+
+/* Font chữ mặc định cho toàn trang: Be Vietnam Pro (hỗ trợ tiếng Việt hoàn hảo) */
+html, body {
+  font-family: 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  scroll-behavior: smooth;
+}
+
+/* Font chữ cho tiêu đề: Lora Serif (được tối ưu hóa tiếng Việt không bị nhảy dấu hay lỗi font) */
+h1, h2, h3, .font-serif {
+  font-family: 'Lora', Georgia, 'Times New Roman', serif;
+}
+
+/* Custom Scrollbar cho giao diện tiệm bánh */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fef3c7; /* amber-100 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d97706; /* amber-600 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b45309; /* amber-700 */
+}
+
+/* Hiệu ứng nhấp nháy nhẹ (pulse glow) cho nút đặt hàng nổi bật */
+@keyframes warm-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(217, 119, 6, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(217, 119, 6, 0.65);
+  }
+}
+
+.animate-warm-glow {
+  animation: warm-glow 3s infinite ease-in-out;
+}
+
+/* Nút cuộn lên đầu trang (Back to top) */
+#back-to-top {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#back-to-top.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+#back-to-top.hide {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(16px);
+}

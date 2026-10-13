@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TechStore Accessories - Shop phụ kiện điện thoại chính hãng hàng đầu. Ốp lưng, cáp sạc nhanh, tai nghe chống ồn, pin dự phòng. Trải nghiệm giỏ hàng thông minh Vue.js 3 reactivity.">
+  <meta name="keywords" content="phụ kiện điện thoại, ốp lưng iphone, tai nghe bluetooth, sạc nhanh gan, vuejs shop, giỏ hàng vue">
+  <meta name="author" content="Sinh Viên Thực Hiện">
+  <title>TechStore Accessories | Giỏ Hàng Thông Minh Vue.js 3</title>
+
+  <!-- Nhúng Google Fonts hỗ trợ tiếng Việt 100% -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+
+  <!-- CSS Framework hỗ trợ: Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Cấu hình Tailwind CSS CDN -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Be Vietnam Pro"', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Style tùy biến (xử lý v-cloak, font chữ, animation giỏ hàng) -->
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-blue-200 selection:text-blue-900">
+
+  <!-- =========================================================================
+       ỨNG DỤNG VUE 3: Bọc toàn bộ trong <div id="app" v-cloak>
+       Giúp Vue quản lý trạng thái Reactive toàn diện:
+       - Header: số lượng giỏ hàng động {{ cartCount }}
+       - Main: thanh tìm kiếm liên kết 2 chiều v-model="tuKhoa" và v-for danh sách sản phẩm
+       - Aside: giỏ hàng v-if/v-for/computed tongTien
+       ========================================================================= -->
+  <div id="app" v-cloak class="flex flex-col min-h-screen">
+
+    <!-- =======================================================================
+         HEADER & NAVIGATION (Mục 3: Navigation tĩnh kết hợp Vue quản lý số lượng giỏ hàng)
+         - Tên shop, menu: Trang chủ, Sản phẩm, Khuyến mãi, Liên hệ
+         - Icon giỏ hàng hiển thị SỐ LƯỢNG {{ cartCount }} qua Vue interpolation
+         ======================================================================= -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+          
+          <!-- Logo shop bên trái -->
+          <a href="#" class="flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition duration-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <div>
+              <span class="font-extrabold text-xl tracking-tight text-slate-900 group-hover:text-blue-600 transition">TECH<span class="text-blue-600">STORE</span></span>
+              <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-400 -mt-1">Accessories</span>
+            </div>
+          </a>
+
+          <!-- Menu điều hướng tĩnh (Navigation) -->
+          <nav class="hidden md:flex items-center space-x-8 text-sm font-semibold text-slate-600">
+            <a href="#san-pham" class="text-blue-600 transition hover:text-blue-700">Trang chủ</a>
+            <a href="#san-pham" class="hover:text-blue-600 transition">Sản phẩm</a>
+            <a href="#khuyen-mai" class="hover:text-blue-600 transition">Khuyến mãi</a>
+            <a href="#lien-he" class="hover:text-blue-600 transition">Liên hệ</a>
+          </nav>
+
+          <!-- Icon giỏ hàng quản lý số lượng động bằng Vue.js {{ cartCount }} -->
+          <div class="flex items-center gap-4">
+            <a href="#gio-hang-aside" class="relative flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold text-sm transition duration-200 border border-blue-200 shadow-sm group">
+              <svg class="w-5 h-5 text-blue-600 group-hover:scale-110 transition transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+              </svg>
+              <span>Giỏ hàng</span>
+              
+              <!-- Badge số lượng do Vue quản lý phản ứng (Reactivity) -->
+              <span 
+                class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-blue-600 rounded-full shadow-sm"
+                :class="{'badge-bounce': cartCount > 0}"
+              >
+                {{ cartCount }}
+              </span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <!-- Thông báo Toast nhanh khi thêm sản phẩm -->
+    <div 
+      v-if="thongBaoToast.hienThi" 
+      class="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 bg-slate-900 text-white text-sm font-medium rounded-xl shadow-2xl border border-slate-700 transition duration-300"
+    >
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+      <span>{{ thongBaoToast.noiDung }}</span>
+    </div>
+
+    <main class="flex-grow">
+
+      <!-- =====================================================================
+           BANNER HERO NHỎ & Ô TÌM KIẾM SẢN PHẨM (Mục 8: v-model="tuKhoa")
+           ===================================================================== -->
+      <section class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 text-white py-12 md:py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center max-w-2xl mx-auto space-y-4">
+            <span class="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold tracking-wider uppercase border border-blue-400/20">
+              Công nghệ tiên phong • Phụ kiện chuẩn gu
+            </span>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+              Phụ Kiện Điện Thoại Cao Cấp
+            </h1>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+              Trang bị tối tân cho dế yêu của bạn: Bảo vệ hoàn hảo, sạc siêu tốc và âm thanh đỉnh cao.
+            </p>
+
+            <!-- Ô tìm kiếm tương tác (Content - Interactive - v-model liên kết 2 chiều) -->
+            <div class="pt-4 max-w-xl mx-auto relative">
+              <div class="relative flex items-center">
+                <input 
+                  type="text" 
+                  v-model="tuKhoa" 
+                  placeholder="Tìm theo tên phụ kiện, danh mục hoặc mô tả (vd: ốp lưng, sạc nhanh, tai nghe...)"
+                  class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-white text-slate-800 placeholder-slate-400 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/40 shadow-xl transition"
+                >
+                <div class="absolute left-4 text-slate-400 pointer-events-none">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  </svg>
+                </div>
+                <!-- Nút xoá tìm kiếm -->
+                <button 
+                  v-if="tuKhoa" 
+                  @click="tuKhoa = ''" 
+                  class="absolute right-4 text-slate-400 hover:text-slate-600 text-sm font-bold p-1"
+                  title="Xoá tìm kiếm"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <!-- Thống kê kết quả tìm kiếm -->
+              <p v-if="tuKhoa" class="text-xs text-blue-200 text-left mt-2 pl-2">
+                Đang lọc cho từ khóa: <strong>"{{ tuKhoa }}"</strong> — tìm thấy <strong>{{ danhSachLoc.length }}</strong> sản phẩm
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           KHU VỰC CHÍNH: SECTION SẢN PHẨM & ASIDE GIỎ HÀNG
+           - Bố cục 2 cột: Danh sách sản phẩm (col-span 8) & Giỏ hàng mini (col-span 4)
+           ===================================================================== -->
+      <section id="san-pham" class="py-12 md:py-16 bg-slate-100/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- ===================================================================
+                 CỘT TRÁI (8 CỘT): DANH SÁCH SẢN PHẨM TỰ ĐỘNG LẶP V-FOR (Mục 5 & Mục 6)
+                 - v-for lặp qua danhSachLoc (computed property của Vue)
+                 - Mỗi sản phẩm là 1 ARTICLE
+                 - Nút "Thêm vào giỏ" @click="themVaoGio(product)"
+                 =================================================================== -->
+            <div class="lg:col-span-8">
+              
+              <div class="flex items-center justify-between mb-6">
+                <div>
+                  <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Danh Sách Phụ Kiện</h2>
+                  <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+                    Hiển thị {{ danhSachLoc.length }} trên tổng số {{ products.length }} sản phẩm
+                  </p>
+                </div>
+
+                <!-- Tag danh mục nhanh -->
+                <div class="hidden sm:flex items-center gap-2 text-xs">
+                  <span class="text-slate-400 font-medium">Lọc nhanh:</span>
+                  <button @click="tuKhoa = ''" class="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:border-blue-500 transition" :class="{'bg-blue-600 text-white border-blue-600': tuKhoa === ''}">Tất cả</button>
+                  <button @click="tuKhoa = 'Ốp lưng'" class="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:border-blue-500 transition" :class="{'bg-blue-600 text-white border-blue-600': tuKhoa === 'Ốp lưng'}">Ốp lưng</button>
+                  <button @click="tuKhoa = 'Sạc'" class="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:border-blue-500 transition" :class="{'bg-blue-600 text-white border-blue-600': tuKhoa === 'Sạc'}">Sạc</button>
+                  <button @click="tuKhoa = 'Tai nghe'" class="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:border-blue-500 transition" :class="{'bg-blue-600 text-white border-blue-600': tuKhoa === 'Tai nghe'}">Tai nghe</button>
+                </div>
+              </div>
+
+              <!-- Trường hợp không tìm thấy sản phẩm nào -->
+              <div v-if="danhSachLoc.length === 0" class="bg-white rounded-2xl p-12 text-center border border-slate-200 shadow-sm">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Không tìm thấy sản phẩm</h3>
+                <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto">
+                  Không có phụ kiện nào khớp với từ khóa "{{ tuKhoa }}". Hãy thử tìm bằng từ khóa khác hoặc xóa bộ lọc.
+                </p>
+                <button @click="tuKhoa = ''" class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition">
+                  Xem tất cả sản phẩm
+                </button>
+              </div>
+
+              <!-- Lưới sản phẩm được Vue render tự động qua v-for (Mục 5) -->
+              <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+                <!-- ARTICLE Sản phẩm: Tự động lặp lại theo mảng danhSachLoc -->
+                <article 
+                  v-for="product in danhSachLoc" 
+                  :key="product.id"
+                  class="bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-lg transition duration-300 overflow-hidden flex flex-col group hover:-translate-y-1"
+                >
+                  <!-- Ảnh sản phẩm -->
+                  <div class="relative aspect-square overflow-hidden bg-slate-50 p-4">
+                    <img 
+                      :src="product.anh" 
+                      :alt="product.ten" 
+                      class="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition duration-500"
+                    >
+                    <!-- Badge trạng thái -->
+                    <span class="absolute top-3 left-3 px-2.5 py-1 text-[11px] font-bold rounded-md bg-blue-100 text-blue-700 shadow-sm">
+                      {{ product.badge }}
+                    </span>
+                    <span class="absolute top-3 right-3 px-2 py-0.5 text-[10px] font-medium rounded bg-slate-100 text-slate-600">
+                      {{ product.danhMuc }}
+                    </span>
+                  </div>
+
+                  <!-- Thông tin chi tiết sản phẩm -->
+                  <div class="p-5 flex flex-col flex-grow justify-between border-t border-slate-100">
+                    <div>
+                      <h3 class="font-bold text-base text-slate-900 group-hover:text-blue-600 transition line-clamp-1">
+                        {{ product.ten }}
+                      </h3>
+                      <p class="text-xs text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">
+                        {{ product.moTa }}
+                      </p>
+                    </div>
+
+                    <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                      <div>
+                        <span class="text-xs text-slate-400 block">Giá bán lẻ</span>
+                        <span class="text-lg font-extrabold text-blue-600">
+                          {{ formatTien(product.gia) }}
+                        </span>
+                      </div>
+
+                      <!-- NÚT THÊM VÀO GIỎ (@click="themVaoGio(product)" - Mục 6) -->
+                      <button 
+                        @click="themVaoGio(product)" 
+                        type="button"
+                        class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-semibold shadow-sm hover:shadow-md transition duration-200 flex items-center gap-1.5"
+                      >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        <span>Thêm vào giỏ</span>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+
+              </div>
+
+            </div>
+
+            <!-- ===================================================================
+                 CỘT PHẢI (4 CỘT): ASIDE "GIỎ HÀNG CỦA BẠN" (Mục 7)
+                 - v-if="cart.length === 0": Thông báo Giỏ hàng trống
+                 - v-else: v-for="(item, index) in cart" liệt kê chi tiết kèm nút xoá @click="xoaKhoiGio(index)"
+                 - Hiển thị tổng tiền tính bằng computed property tongTien
+                 =================================================================== -->
+            <aside id="gio-hang-aside" class="lg:col-span-4 sticky top-24">
+              <div class="bg-white rounded-2xl border border-slate-200 shadow-md overflow-hidden">
+                
+                <!-- Tiêu đề giỏ hàng -->
+                <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    <div>
+                      <h3 class="font-bold text-base">Giỏ Hàng Của Bạn</h3>
+                      <p class="text-[11px] text-slate-400">Reactivity cập nhật tức thì</p>
+                    </div>
+                  </div>
+                  <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-blue-600 text-white">
+                    {{ cartCount }} món
+                  </span>
+                </div>
+
+                <div class="p-5">
+                  
+                  <!-- Trường hợp 1: GIỎ HÀNG TRỐNG (v-if="cart.length === 0") -->
+                  <div v-if="cart.length === 0" class="py-10 text-center">
+                    <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                      </svg>
+                    </div>
+                    <p class="font-semibold text-sm text-slate-700">Giỏ hàng đang trống</p>
+                    <p class="text-xs text-slate-400 mt-1">Chọn sản phẩm bên cạnh để thêm vào giỏ hàng nhé!</p>
+                  </div>
+
+                  <!-- Trường hợp 2: CÓ SẢN PHẨM TRONG GIỎ (v-else) -->
+                  <div v-else class="space-y-4">
+                    
+                    <!-- Danh sách các item trong giỏ (v-for) -->
+                    <div class="max-h-80 overflow-y-auto cart-scroll space-y-3 pr-1">
+                      <div 
+                        v-for="(item, index) in cart" 
+                        :key="index"
+                        class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition"
+                      >
+                        <!-- Ảnh thu nhỏ -->
+                        <img :src="item.anh" :alt="item.ten" class="w-12 h-12 rounded-lg object-contain bg-white p-1 border border-slate-200 flex-shrink-0">
+                        
+                        <!-- Tên & Giá -->
+                        <div class="flex-grow min-w-0">
+                          <p class="font-bold text-xs text-slate-800 truncate">{{ item.ten }}</p>
+                          <p class="text-xs font-semibold text-blue-600 mt-0.5">{{ formatTien(item.gia) }}</p>
+                          
+                          <!-- Tăng giảm số lượng -->
+                          <div class="flex items-center gap-2 mt-1.5">
+                            <div class="flex items-center border border-slate-200 rounded-md bg-white">
+                              <button @click="giamSoLuong(item, index)" class="px-2 py-0.5 text-xs text-slate-600 hover:bg-slate-100 font-bold">-</button>
+                              <span class="px-2 text-xs font-semibold text-slate-800">{{ item.soLuong }}</span>
+                              <button @click="tangSoLuong(item)" class="px-2 py-0.5 text-xs text-slate-600 hover:bg-slate-100 font-bold">+</button>
+                            </div>
+                            <span class="text-[11px] text-slate-400">× {{ formatTien(item.gia) }}</span>
+                          </div>
+                        </div>
+
+                        <!-- NÚT XOÁ SẢN PHẨM (@click="xoaKhoiGio(index)" - Mục 7) -->
+                        <button 
+                          @click="xoaKhoiGio(index)" 
+                          class="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 transition"
+                          title="Xóa khỏi giỏ"
+                        >
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Phần tính tổng tiền (computed property tongTien) -->
+                    <div class="pt-4 border-t border-slate-200 space-y-2">
+                      <div class="flex justify-between text-xs text-slate-500">
+                        <span>Tạm tính ({{ cartCount }} sản phẩm):</span>
+                        <span class="font-medium text-slate-800">{{ tongTienFormat }}</span>
+                      </div>
+                      <div class="flex justify-between text-xs text-slate-500">
+                        <span>Phí vận chuyển:</span>
+                        <span class="font-medium text-emerald-600">Miễn phí</span>
+                      </div>
+                      <div class="flex justify-between items-baseline pt-2 border-t border-dashed border-slate-200">
+                        <span class="font-bold text-sm text-slate-900">TỔNG CỘNG:</span>
+                        <span class="font-extrabold text-xl text-blue-600">{{ tongTienFormat }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Nút Checkout & Xóa hết -->
+                    <div class="space-y-2 pt-2">
+                      <button 
+                        @click="thanhToan" 
+                        class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-blue-500/20 transition duration-200 flex items-center justify-center gap-2"
+                      >
+                        <span>Tiến Hành Đặt Hàng</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                      </button>
+
+                      <button 
+                        @click="xoaHetGioHang" 
+                        class="w-full py-1.5 text-xs text-slate-400 hover:text-rose-500 font-medium transition"
+                      >
+                        Dọn sạch giỏ hàng
+                      </button>
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+            </aside>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECTION: KHUYẾN MÃI HÔM NAY (Mục 9: Tĩnh giới thiệu chương trình giảm giá)
+           - Mockup theo đề: "GET 20% OFF ALL CASES! LIMITED TIME OFFER"
+           ===================================================================== -->
+      <section id="khuyen-mai" class="py-12 bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+            
+            <div class="space-y-2 text-center md:text-left">
+              <span class="inline-block px-3 py-1 rounded-md bg-yellow-400 text-slate-950 text-xs font-black uppercase tracking-wider">
+                Ưu đãi chớp nhoáng
+              </span>
+              <h2 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight uppercase">
+                GET 20% OFF ALL CASES! LIMITED TIME OFFER
+              </h2>
+              <p class="text-blue-100 text-sm max-w-xl">
+                Nhập mã ưu đãi <span class="bg-white/20 px-2 py-0.5 rounded font-mono font-bold text-yellow-300">TECH2026</span> khi thanh toán cho toàn bộ danh mục ốp lưng cao cấp.
+              </p>
+            </div>
+
+            <div class="flex-shrink-0">
+              <a 
+                href="#san-pham" 
+                @click="tuKhoa = 'Ốp lưng'" 
+                class="inline-block px-8 py-3.5 bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-extrabold text-sm rounded-full shadow-lg hover:shadow-yellow-400/30 transition transform hover:-translate-y-0.5"
+              >
+                Săn Ưu Đãi Ngay
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- =======================================================================
+         FOOTER (Mục 10: Thông tin liên hệ, mạng xã hội, bản quyền)
+         ======================================================================= -->
+    <footer id="lien-he" class="bg-slate-950 text-slate-400 pt-14 pb-8 border-t border-slate-900">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-slate-800/80">
+          
+          <!-- Cột 1: Về cửa hàng -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                TS
+              </div>
+              <span class="font-extrabold text-lg text-white">TechStore</span>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Hệ thống cung cấp phụ kiện công nghệ chính hãng, tiêu chuẩn bảo hành 12 tháng 1 đổi 1 tận tâm trên toàn quốc.
+            </p>
+          </div>
+
+          <!-- Cột 2: Hỗ trợ khách hàng -->
+          <div class="space-y-3">
+            <h4 class="text-sm font-bold text-white uppercase tracking-wider">Hỗ Trợ Khách Hàng</h4>
+            <ul class="text-xs space-y-2">
+              <li><a href="#" class="hover:text-blue-400 transition">Hướng dẫn mua hàng</a></li>
+              <li><a href="#" class="hover:text-blue-400 transition">Chính sách bảo hành & đổi trả</a></li>
+              <li><a href="#" class="hover:text-blue-400 transition">Tra cứu vận đơn giao hàng</a></li>
+              <li><a href="#" class="hover:text-blue-400 transition">Chính sách bảo mật thông tin</a></li>
+            </ul>
+          </div>
+
+          <!-- Cột 3: Liên hệ -->
+          <div class="space-y-3">
+            <h4 class="text-sm font-bold text-white uppercase tracking-wider">Thông Tin Liên Hệ</h4>
+            <ul class="text-xs space-y-2 text-slate-400">
+              <li>📍 Địa chỉ: 456 Đại Lộ Công Nghệ, Quận 7, TP. Hồ Chí Minh</li>
+              <li>📞 Hotline: 1900 6868 (8:00 - 21:30)</li>
+              <li>✉️ Email: support@techstore.vn</li>
+            </ul>
+          </div>
+
+          <!-- Cột 4: Mạng xã hội & Thanh toán -->
+          <div class="space-y-3">
+            <h4 class="text-sm font-bold text-white uppercase tracking-wider">Mạng Xã Hội</h4>
+            <div class="flex items-center gap-3">
+              <a href="#" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-blue-600 text-white flex items-center justify-center transition" aria-label="Facebook">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+              </a>
+              <a href="#" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-blue-600 text-white flex items-center justify-center transition" aria-label="Instagram">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              </a>
+              <a href="#" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-blue-600 text-white flex items-center justify-center transition" aria-label="YouTube">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
+          <p>&copy; 2026 TechStore Accessories. Giỏ hàng động với Vue.js 3 Reactivity (CDN).</p>
+          <p>Bài tập 5: Thiết kế web - Giỏ hàng mini và cơ chế phản ứng dữ liệu</p>
+        </div>
+
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- =========================================================================
+       NHÚNG THƯ VIỆN VÀ SCRIPT THEO ĐÚNG THỨ TỰ BẮT BUỘC (Mục 2)
+       1. Vue.js 3 CDN nhúng TRƯỚC app.js
+       2. app.js nhúng SAU Vue.js CDN
+       ========================================================================= -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="../js/app.js"></script>
+</body>
+</html>
